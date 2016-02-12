@@ -1,0 +1,96 @@
+<!-- this is an AngularJS View Template -->
+<!-- it is necessary to create a module into which we place our ng-app -->
+<html ng-app="AngularJSExample">
+    <head>
+        <!-- from Google Hosted Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.17/angular.min.js"></script>
+        <script lang="javascript">
+        
+            var myModule = angular.module('AngularJSExample', []);
+            
+            //first register the controller - https://docs.angularjs.org/guide/migration
+            myModule.controller('CostController', 
+                //we make an AngularJS controller right here in the template (we won't normally do this though)
+                function ($scope) {
+                    
+                    
+                    
+                    var cc = this;
+
+                    cc.cost = 1000.1;
+                    cc.add_tax = true;
+                    cc.total_bill = true;
+                    cc.tentax = cc.cost * 0.10;
+                    cc.fifteentax = cc.cost * 0.15;
+                    cc.twentytax = cc.cost * 0.20;
+                    
+                    function update(){
+                        
+                        cc.tax = cc.add_tax ? cc.cost * 0.15 : 0.0;    
+                        cc.total = parseFloat(cc.cost) + cc.tax; 
+                        cc.tentax = cc.add_tax ? cc.cost * 0.10 : 0.0;
+                        cc.fifteentax = cc.add_tax ? cc.cost * 0.15 : 0.0;
+                        cc.twentytax = cc.add_tax ? cc.cost * 0.20 : 0.0;
+                        
+                    }
+                    
+                    //used to detect when cost changes
+                    $scope.$watch('cc.cost', update);
+                    $scope.$watch('cc.add_tax', update);
+                    $scope.$watch('cc.cost + cc.tax', update);
+                    
+                    //final bill
+                    cc.final_bill = 0.0;
+                    cc.add = function add(){
+                        cc.final_bill += cc.total;   
+                    };
+                    
+                    cc.final_bill = 0.0;
+                    cc.addtentip = function addtentip(){
+                        cc.final_bill += cc.tentax;   
+                    };
+                    cc.final_bill = 0.0;
+                    cc.addfiftip = function addfiftip(){
+                        cc.final_bill += cc.fifteentax;   
+                    };
+                    cc.final_bill = 0.0;
+                    cc.addtwentip = function addtwentip(){
+                        cc.final_bill += cc.twentytax;   
+                    };
+                }
+            );
+        </script>
+    </head>
+    <body>
+        <div ng-controller="CostController as cc">
+            
+            <input type="checkbox" ng-model="cc.total_bill" />Show Total
+            <p> 
+                Cost: <input type="text" ng-model="cc.cost" placeholder="cost" /><br/>
+                <input type="checkbox" ng-model="cc.add_tax" />Add 15% state tax? <br/>
+                
+            </p>
+            <p>
+                <!-- the angular directive both associates with the cost model and
+                uses a built-in formatting capability -->
+                This is your cost: {{cc.cost|currency}}
+            </p>
+            <p>
+                This is your tax: {{cc.tax|currency}}
+            </p>
+            
+            <p ng-show="cc.total_bill">
+                This is your total: {{cc.total|currency}}
+                <button ng-click="cc.add()">Add</button>
+            </p>
+            <p>
+                This would be a 10% tip amount: {{cc.tentax|currency}} <button ng-click="cc.addtentip()">Add</button> <br/>
+                This would be a 15% tip amount: {{cc.fifteentax|currency}}  <button ng-click="cc.addfiftip()">Add</button><br/>
+                This would be a 20% tip amount: {{cc.twentytax|currency}} <button ng-click="cc.addtwentip()">Add</button> <br/>
+            </p>
+            <p ng-show="cc.total_bill">
+                Your running total is {{cc.final_bill|currency}}
+            </p>
+        </div>
+    </body>
+</html>
