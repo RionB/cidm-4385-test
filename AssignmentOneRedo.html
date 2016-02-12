@@ -13,38 +13,107 @@
                 //we make an AngularJS controller right here in the template (we won't normally do this though)
                 function ($scope) {
                     
-                    var cc = this;
+                     var cc = this;
 
                     cc.cost = 1000.1;
-                    cc.add_tax = true;
+                    cc.add_tip = true;
                     cc.total_bill = true;
+                    cc.tentip = cc.cost * 0.10;
+                    cc.fifteentip = cc.cost * 0.15;
+                    cc.twentytip = cc.cost * 0.20;
+                    
                     
                     function update(){
                         
-                        cc.tax = cc.add_tax ? cc.cost * 0.15 : 0.0;    
-                        cc.total = parseFloat(cc.cost) + cc.tax + cc.shipping.amount; 
+                        cc.taxtotal = cc.tax.amount * cc.cost;    
+                        cc.total = parseFloat(cc.cost) + cc.taxtotal; 
+                        cc.tentip = cc.add_tip ? cc.cost * 0.10 : 0.0;
+                        cc.fifteentip = cc.add_tip ? cc.cost * 0.15 : 0.0;
+                        cc.twentytip = cc.add_tip ? cc.cost * 0.20 : 0.0;
+                        
                     }
                     
                     //used to detect when cost changes
                     $scope.$watch('cc.cost', update);
-                    $scope.$watch('cc.add_tax', update);
-                    $scope.$watch('cc.shipping', update);
-                    $scope.$watch('cc.cost + cc.tax', update);
+                    $scope.$watch('cc.add_tip', update);
+                    $scope.$watch('cc.tax', update);
+                    $scope.$watch('cc.cost + cc.tip', update);
+                    $scope.$watch('cc.tax_options', update);
                     
                     //final bill
                     cc.final_bill = 0.0;
                     cc.add = function add(){
                         cc.final_bill += cc.total;   
-                    }
+                    };
                     
-                    //shipping options
-                    cc.shipping_options = [
-                        {amount:10.0, name:"Flat Rate"},
-                        {amount:20.0, name:"Express"},
-                        {amount:30.0, name:"Super Express"}
+                    cc.final_bill = 0.0;
+                    cc.addtentip = function addtentip(){
+                        cc.final_bill += cc.tentip;   
+                    };
+                    cc.final_bill = 0.0;
+                    cc.addfiftip = function addfiftip(){
+                        cc.final_bill += cc.fifteentip;   
+                    };
+                    cc.final_bill = 0.0;
+                    cc.addtwentip = function addtwentip(){
+                        cc.final_bill += cc.twentytip;   
+                    };
+                    
+                    //state tax options
+                    cc.tax_options = [
+                        {amount:0.04, name:"Alabama"},
+                        {amount:0.0, name:"Alaska"},
+                        {amount:0.056, name:"Arizona"},
+                        {amount:0.065, name:"Arkansas"},
+                        {amount:0.075, name:"California"},
+                        {amount:0.029, name:"Colorado"},
+                        {amount:0.0635, name:"Connecticut"},
+                        {amount:0.0, name:"Delaware"},
+                        {amount:0.06, name:"Florida"},
+                        {amount:0.04, name:"Georgia"},
+                        {amount:0.04, name:"Hawaii"},
+                        {amount:0.06, name:"Idaho"},
+                        {amount:0.0625, name:"Illinois"},
+                        {amount:0.07, name:"Indiana"},
+                        {amount:0.06, name:"Iowa"},
+                        {amount:0.065, name:"Kansas"},
+                        {amount:0.06, name:"Kentucky"},
+                        {amount:0.04, name:"Louisiana"},
+                        {amount:0.055, name:"Maine"},
+                        {amount:0.06, name:"Maryland"},
+                        {amount:0.0625, name:"Massachusetts"},
+                        {amount:0.06, name:"Michigan"},
+                        {amount:0.06875, name:"Minnesota"},
+                        {amount:0.07, name:"Mississippi"},
+                        {amount:0.04225, name:"Missouri"},
+                        {amount:0.0, name:"Montana"},
+                        {amount:0.055, name:"Nebraska"},
+                        {amount:0.0685, name:"Nevada"},
+                        {amount:0.0, name:"New Hampshire"},
+                        {amount:0.07, name:"New Jersey"},
+                        {amount:0.05125, name:"New Mexico"},
+                        {amount:0.04, name:"New York"},
+                        {amount:0.0475, name:"North Carolina"},
+                        {amount:0.05, name:"North Dakota"},
+                        {amount:0.0575, name:"Ohio"},
+                        {amount:0.045, name:"Oklahoma"},
+                        {amount:0.0, name:"Oregon"},
+                        {amount:0.06, name:"Pennsylvania"},
+                        {amount:0.07, name:"Rhode Island"},
+                        {amount:0.06, name:"South Carolina"},
+                        {amount:0.04, name:"South Dakota"},
+                        {amount:0.07, name:"Tennessee"},
+                        {amount:0.0625, name:"Texas"},
+                        {amount:0.047, name:"Utah"},
+                        {amount:0.06, name:"Vermont"},
+                        {amount:0.043, name:"Virginia"},
+                        {amount:0.065, name:"Washington"},
+                        {amount:0.06, name:"West Virginia"},
+                        {amount:0.05, name:"Wisconsin"},
+                        {amount:0.04, name:"Wyoming"}
                     ];
                     
-                    cc.shipping = cc.shipping_options[0];
+                    cc.tax = cc.tax_options[0];
                     
                     
                 }
@@ -53,24 +122,29 @@
     </head>
     <body>
         <div ng-controller="CostController as cc">
-            <input type="checkbox" ng-model="cc.add_tax" />Add Tax
+            <input type="checkbox" ng-model="cc.add_tip" />Add Tip
             <input type="checkbox" ng-model="cc.total_bill" />Show Total
             <p>
                 Cost: <input type="text" ng-model="cc.cost" placeholder="cost" /><br/>
-                Shipping: <select ng-model="cc.shipping" ng-options="s.name for s in cc.shipping_options"></select>
             </p>
             <p>
                 <!-- the angular directive both associates with the cost model and
                 uses a built-in formatting capability -->
-                This is your cost: {{cc.cost|currency}}
+                This is your cost before tax: {{cc.cost|currency}}
             </p>
             <p>
-                This is your tax: {{cc.tax|currency}}
+                Select state for tax: <select ng-model="cc.tax" ng-options="s.name for s in cc.tax_options"></select>
             </p>
             <p ng-show="cc.total_bill">
-                This is your total: {{cc.total|currency}}
+                This is your total after tax: {{cc.total|currency}}
                 <button ng-click="cc.add()">Add</button>
             </p>
+            <p ng-show="cc.add_tip">
+                This would be a 10% tip amount: {{cc.tentip|currency}} <button ng-click="cc.addtentip()">Add</button> <br/>
+                This would be a 15% tip amount: {{cc.fifteentip|currency}}  <button ng-click="cc.addfiftip()">Add</button><br/>
+                This would be a 20% tip amount: {{cc.twentytip|currency}} <button ng-click="cc.addtwentip()">Add</button> <br/>
+            </p>
+            
             <p ng-show="cc.total_bill">
                 Your running total is {{cc.final_bill|currency}}
             </p>
